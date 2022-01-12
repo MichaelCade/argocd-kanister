@@ -5,7 +5,7 @@ metadata:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-wave: "1"
   creationTimestamp: null
-  name: pre-sync-k10-basic
+  name: kanister-pre-sync
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
