@@ -4,4 +4,4 @@ metadata:
   annotations: 
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-wave: "1"
-  name: kasten-pre-sync
+  name: myrelease-kanister-operator
