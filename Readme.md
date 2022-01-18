@@ -111,6 +111,76 @@ this blueprint is created in the Kanister namespace check with environment
 kubectl get blueprint -n kanister 
 ```
 
-## Sync the project
+# Use argo to deploy your app
 
-Create in argo a new project using the clone repository.
+## Create the argo project
+
+Create in argo a new project mysql-app :
+- use the default project 
+- git repo : https://github.com/michaelcourcy/argocd-kanister.git
+- path : base
+- choose the default values for the rest
+
+## Create some data 
+
+```
+kubectl exec -ti mysql-0 -n mysql -- bash
+
+mysql --user=root --password=ultrasecurepassword
+CREATE DATABASE test;
+USE test;
+CREATE TABLE pets (name VARCHAR(20), owner VARCHAR(20), species VARCHAR(20), sex CHAR(1), birth DATE, death DATE);
+INSERT INTO pets VALUES ('Puffball','Diane','hamster','f','1999-03-30',NULL);
+SELECT * FROM pets;
++----------+-------+---------+------+------------+-------+
+| name     | owner | species | sex  | birth      | death |
++----------+-------+---------+------+------------+-------+
+| Puffball | Diane | hamster | f    | 1999-03-30 | NULL  |
++----------+-------+---------+------+------------+-------+
+1 row in set (0.00 sec)
+```
+
+## Introduce some "bad" change in your application stack.
+
+Let's imagine you create a mysqlclient app which is going to drop your database in your code 
+
+Create this pod base/mysql-client.yaml 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: mysql-client
+  name: mysql-client
+spec:
+  containers:
+  - image: mysql:8.0.26
+    name: mysql-client
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-root-password
+          name: mysql
+    command: 
+      - sh
+      - -o
+      - errexit
+      - -o
+      - pipefail
+      - -c
+      - |         
+        mysql -h mysql --user=root --password=$MYSQL_ROOT_PASSWORD -e "DROP DATABASE test;"
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+status: {}
+```
+
+You commit, push ans sync with argo ...  
+
+The sync has deleted the database but fortunaletly kanister protect your database.
+
+# Restore your database using kanctl
+
+TODO 
