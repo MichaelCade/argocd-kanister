@@ -51,7 +51,7 @@ spec:
                  secrets:
                    mysql:
                      name: mysql
-                     namespace: mysql
+                     namespace: $NAMESPACE
              EOF
             
              # Wait until the backup action is complete 

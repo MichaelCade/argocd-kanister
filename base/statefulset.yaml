@@ -3,6 +3,8 @@ kind: StatefulSet
 metadata:
   name: mysql
   namespace: mysql
+  labels:
+    app.kubernetes.io/instance: mysql
 spec:
   selector:
     matchLabels:
