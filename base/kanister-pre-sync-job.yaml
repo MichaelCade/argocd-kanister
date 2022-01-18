@@ -61,7 +61,7 @@ spec:
              while true 
              do
                state=$(kubectl get actionset -n kanister $backup_name -o jsonpath='{.status.state}')
-               if [ "$state" =  "Complete" ]
+               if [ "$state" =  "complete" ]
                then 
                  echo "actionset $backup_name is Complete"                
                  break
