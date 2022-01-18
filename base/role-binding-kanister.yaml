@@ -5,7 +5,8 @@ metadata:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-wave: "1"
   creationTimestamp: null
-  name: kanister-presync-operator
+  name: kanister-presync-operator-mysql
+  namespace: kanister
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -13,3 +14,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kanister-presync
+  namespace: mysql

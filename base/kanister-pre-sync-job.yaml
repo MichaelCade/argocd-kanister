@@ -35,8 +35,8 @@ spec:
              apiVersion: cr.kanister.io/v1alpha1
              kind: ActionSet
              metadata:  
-               name: $backup_name
-               namespace: $NAMESPACE   
+               name: $backup_name               
+               namespace: kanister   
              spec:
                actions:
                - blueprint: mysql-blueprint

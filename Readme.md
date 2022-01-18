@@ -116,10 +116,18 @@ kubectl get blueprint -n kanister
 ## Create the argo project
 
 Create in argo a new project mysql-app :
+- project name : mysql
 - use the default project 
 - git repo : https://github.com/michaelcourcy/argocd-kanister.git
 - path : base
-- choose the default values for the rest
+- namespace: mysql
+- choose the default or availables values for the rest
+
+Once deployed, check the service account kanister-presync can create an action set in the kanister namespace.
+
+```
+kubectl auth can-i create actionset --as=system:serviceaccount:mysql:kanister-presync -n kanister
+```
 
 ## Create some data 
 
@@ -139,6 +147,10 @@ SELECT * FROM pets;
 +----------+-------+---------+------+------------+-------+
 1 row in set (0.00 sec)
 ```
+
+## Sync your project 
+
+By resyncing your project you're going to trigger the creation 
 
 ## Introduce some "bad" change in your application stack.
 
