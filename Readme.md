@@ -82,7 +82,7 @@ This will give us some where to store our backups, this will be done using the K
 
 ```
 kanctl create profile \
-   --namespace mysql \
+   --namespace kanister \
    --bucket kanister \
    --skip-SSL-verification \
    --endpoint http://$EXTERNAL_IP:9000/ \
@@ -118,7 +118,7 @@ kubectl get blueprint -n kanister
 Create in argo a new project mysql-app :
 - project name : mysql
 - use the default project 
-- git repo : https://github.com/michaelcourcy/argocd-kanister.git
+- git repo : your git repo (eg: https://github.com/michaelcourcy/argocd-kanister.git)
 - path : base
 - namespace: mysql
 - choose the default or availables values for the rest
@@ -128,6 +128,8 @@ Once deployed, check the service account kanister-presync can create an action s
 ```
 kubectl auth can-i create actionset --as=system:serviceaccount:mysql:kanister-presync -n kanister
 ```
+
+The answer should be yes.
 
 ## Create some data 
 
