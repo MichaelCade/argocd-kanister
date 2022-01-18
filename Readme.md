@@ -4,11 +4,6 @@ Deploy local Minikube cluster
 
 minikube start --addons volumesnapshots,csi-hostpath-driver --apiserver-port=6443 --container-runtime=containerd -p mc-demo --kubernetes-version=1.21.2
 
-## Create a mysql namespace 
-
-```
-kubectl create ns mysql
-```
 
 ## How to Install Kanister 
 
@@ -93,9 +88,9 @@ kanctl create profile \
 
 confirm you now have a profile created 
 ```
-kubectl get profile -n mysql
-PROFILE=$(kubectl get profile -n mysql -o jsonpath='{.items[0].metadata.name}')
+kubectl get profile -n kanister
 ```
+
 ## Creating a Kanister Blueprint 
 
 Kanister uses Blueprints to define these database-specific workflows and open-source Blueprints are available for several popular applications. It's also simple to customize existing Blueprints or add new ones.
@@ -114,6 +109,11 @@ kubectl get blueprint -n kanister
 # Use argo to deploy your app
 
 ## Create the argo project
+
+Create a mysql namespace.
+``` 
+kubectl create ns mysql
+```
 
 Create in argo a new project mysql-app :
 - project name : mysql
@@ -148,11 +148,13 @@ SELECT * FROM pets;
 | Puffball | Diane | hamster | f    | 1999-03-30 | NULL  |
 +----------+-------+---------+------+------------+-------+
 1 row in set (0.00 sec)
+exit
+exit
 ```
 
 ## Sync your project 
 
-By resyncing your project you're going to trigger the creation 
+By resyncing your project you're going to trigger the creation of a backup. check on minio.
 
 ## Introduce some "bad" change in your application stack.
 
