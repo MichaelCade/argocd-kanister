@@ -3,14 +3,14 @@ kind: Job
 metadata:
   generateName: kanister-pre-sync-
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: PreSync    
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   template:
     metadata:
       creationTimestamp: null
     spec:
-      serviceAccountName: myrelease-kanister-operator
+      serviceAccountName: kanister-presync
       containers:
        - image: ghcr.io/kanisterio/kanister-kubectl:1.18
          command:
@@ -21,6 +21,14 @@ spec:
            - pipefail
            - -c
            - |
+             # if mysql does not exist yet just exit 
+             if [ $(kubectl get sts -n $NAMESPACE | wc -l) -eq 0 ]
+             then 
+                echo "No statefulset deployed yet in $NAMESPACE, nothing to do";
+                exit 0
+             fi
+             # pickup the first kanister profile in tne namespace 
+             PROFILE=$(kubectl get profile -n $NAMESPACE -o jsonpath='{.items[0].metadata.name}')
              # create an actionset on the project 
              backup_name="mysqlapp-backup-$(date| tr ' ' '-'|tr ':' '-'|tr '[:upper:]' '[:lower:]')"
              cat <<EOF | kubectl create -f -
@@ -36,10 +44,10 @@ spec:
                  object: 
                    kind: statefulset
                    name: mysql
-                   namespace: mysql
+                   namespace: $NAMESPACE
                  profile: 
-                   name: s3-profile-4zsr9
-                   namespace: mysql
+                   name: $PROFILE
+                   namespace: $NAMESPACE
                  secrets:
                    mysql:
                      name: mysql
