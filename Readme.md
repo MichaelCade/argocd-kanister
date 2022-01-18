@@ -111,4 +111,6 @@ this blueprint is created in the Kanister namespace check with environment
 kubectl get blueprint -n kanister 
 ```
 
-At this stage I need to clone the repo for Kasten and then look at the pre sync command and change to use an actionset vs the backupaction it is today. I feel like that the kanctl is going to be an issue as well. 
+## Sync the project
+
+Create in argo a new project using the clone repository.
