@@ -9,7 +9,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: myrelease-kanister-operator-cr-role
+  name: myrelease-kanister-operator-cluster-role
 subjects:
 - kind: ServiceAccount
   name: kanister-presync
