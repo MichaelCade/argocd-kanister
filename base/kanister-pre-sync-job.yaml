@@ -47,7 +47,7 @@ spec:
                    namespace: $NAMESPACE
                  profile: 
                    name: $PROFILE
-                   namespace: $NAMESPACE
+                   namespace: kanister
                  secrets:
                    mysql:
                      name: mysql
