@@ -123,13 +123,14 @@ Create in argo a new project mysql-app :
 - namespace: mysql
 - choose the default or availables values for the rest
 
-Once deployed, check the service account kanister-presync can create an action set in the kanister namespace.
+Once deployed, check the service account kanister-presync can create an action or read a profile set in the kanister namespace.
 
 ```
 kubectl auth can-i create actionset --as=system:serviceaccount:mysql:kanister-presync -n kanister
+kubectl auth can-i create profile --as=system:serviceaccount:mysql:kanister-presync -n kanister
 ```
 
-The answer should be yes.
+The answer should be yes for both.
 
 ## Create some data 
 
@@ -158,7 +159,7 @@ By resyncing your project you're going to trigger the creation of a backup. chec
 
 ## Introduce some "bad" change in your application stack.
 
-Let's imagine you create a mysqlclient app which is going to drop your database in your code 
+Let's imagine you create a mysqlclient app which is going to drop your database in your code, that's a mistake. But mistake happen. 
 
 Create this pod base/mysql-client.yaml 
 
@@ -183,8 +184,6 @@ spec:
       - sh
       - -o
       - errexit
-      - -o
-      - pipefail
       - -c
       - |         
         mysql -h mysql --user=root --password=$MYSQL_ROOT_PASSWORD -e "DROP DATABASE test;"
@@ -193,9 +192,26 @@ spec:
 status: {}
 ```
 
-You commit, push ans sync with argo ...  
+You commit, push ans sync with argo and check your data 
 
-The sync has deleted the database but fortunaletly kanister protect your database.
+```
+kubectl exec -ti mysql-0 -n mysql -- bash
+
+mysql --user=root --password=ultrasecurepassword
+SHOW DATABASES;
+
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+```
+
+Horror !!! The sync has deleted the database but fortunaletly kanister protect your database in the execution of the presync.
 
 # Restore your database using kanctl
 
