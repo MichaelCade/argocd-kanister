@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: mysql-client
+  name: mysql-client
+spec:
+  containers:
+  - image: mysql:8.0.26
+    name: mysql-client
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: mysql-root-password
+          name: mysql
+    command: 
+      - sh
+      - -o
+      - errexit
+      - -c
+      - |         
+        mysql -h mysql --user=root --password=$MYSQL_ROOT_PASSWORD -e "DROP DATABASE test;"
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+status: {}
