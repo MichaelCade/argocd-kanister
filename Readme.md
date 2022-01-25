@@ -192,7 +192,7 @@ spec:
 status: {}
 ```
 
-You commit, push ans sync with argo and check your data 
+You commit, push and sync with argo and check your data 
 
 ```
 kubectl exec -ti mysql-0 -n mysql -- bash
@@ -211,8 +211,53 @@ SHOW DATABASES;
 4 rows in set (0.00 sec)
 ```
 
-Horror !!! The sync has deleted the database but fortunaletly kanister protect your database in the execution of the presync.
+Horror !!! The sync has deleted the database but fortunaletly kanister protects your database in the execution of the presync.
 
 # Restore your database using kanctl
 
-TODO 
+The sync above represents a simple change in code that could affect our data, at this stage the bad `mysql-client.yaml` should be removed or configured correctly before continuing with the restore process. 
+
+Before we restore we need to choose the appropriate restore point. 
+
+`kubectl get actionset -n kanister`
+
+```
+NAME                                           AGE
+mysqlapp-backup-tue-jan-25-17-46-46-utc-2022   10m
+mysqlapp-backup-tue-jan-25-17-50-45-utc-2022   6m56s
+```
+When we have the list we can choose the correct actionset to restore from. 
+
+`kanctl --namespace kanister create actionset --action restore --from "mysqlapp-backup-tue-jan-25-17-50-45-utc-2022"`
+
+```
+actionset restore-mysqlapp-backup-tue-jan-25-17-50-45-utc-2022-hsjvv created
+```
+Now we can see in detail what is happening as part of the restore process. 
+
+
+`kubectl --namespace kanister describe actionset restore-mysqlapp-backup-tue-jan-25-17-50-45-utc-2022-hsjvv`
+
+
+We can then go and check on our data and database again and make sure that our test database is restored along with our data. 
+
+```
+kubectl exec -ti mysql-0 -n mysql -- bash
+
+mysql --user=root --password=ultrasecurepassword
+CREATE DATABASE test;
+USE test;
+SELECT * FROM pets;
++----------+-------+---------+------+------------+-------+
+| name     | owner | species | sex  | birth      | death |
++----------+-------+---------+------+------------+-------+
+| Puffball | Diane | hamster | f    | 1999-03-30 | NULL  |
++----------+-------+---------+------+------------+-------+
+1 row in set (0.00 sec)
+
+SHOW DATABASES;
+
+exit
+exit
+```
+
